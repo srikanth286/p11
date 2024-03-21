@@ -1,0 +1,19 @@
+version: '3.1'
+
+services:
+  softhsm:
+    build: 
+      context: ./softhsm
+      dockerfile: Dockerfile
+    restart: always
+    volumes: 
+      - vol_softhsm:/usr/local/lib/softhsm/
+      - ./python_scripts:/p11
+
+volumes:
+  vol_softhsm:
+ 
+networks:
+  default:
+    name: "p11_net"
+
