@@ -53,10 +53,10 @@ if search_result:
     print('Total number of keys:', len(search_result))
     
     for res_handle in search_result:
-        obj_template = LowLevel.ckattrlist(3)
+        obj_template = LowLevel.ckattrlist(2)
         obj_template[0].SetType(LowLevel.CKA_LABEL)
         obj_template[1].SetType(LowLevel.CKA_KEY_TYPE)
-        obj_template[2].SetType(LowLevel.CKA_VALUE_LEN)
+        # obj_template[2].SetType(LowLevel.CKA_VALUE_LEN)
 
         rv = p11_lib.C_GetAttributeValue(session, res_handle, obj_template)
         print('%s : C_GetAttributeValue'%rv)

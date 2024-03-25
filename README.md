@@ -65,10 +65,18 @@ python3 pkcs11_encrypt_decrypt_symm_key.py -p qwerty123 -f /tmp/abc.txt -m cbc_p
 - pkcs11_unwrap_symm_key.py
 
 ### asymm key rsa
-- pkcs11_create_asymm_rsa_key.py
-- pkcs11_destroy_asymm_key_rsa.py
-- pkcs11_sign_verify_asymm.py
-- pkcs11_encrypt_decrypt_asymm_key.py
+x pkcs11_create_asymm_rsa_key.py
+python3 pkcs11_create_asymm_key.py -p qwerty123 -n 2048 -k rsa1
+
+x pkcs11_destroy_asymm_key_rsa.py
+python3 pkcs11_destroy_asymm_key.py -p qwerty123 -k rsa2k
+
+x pkcs11_sign_verify_asymm.py
+python3 pkcs11_sign_verify_asymm.py -p qwerty123 -f /tmp/abc.txt -k rsa2k
+
+x pkcs11_encrypt_decrypt_asymm_key.py
+python3 pkcs11_encrypt_decrypt_asymm_key.py -p qwerty123 -k rsa2k -f /tmp/abc.txt 
+
 - pkcs11_import_asymm_key.py
 - pkcs11_export_asymm_key.py
 
