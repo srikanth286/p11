@@ -6,7 +6,7 @@ import pkcs11_consts as const
 description = '''
 Find all the objects in the HSM
 Example:
-./pkcs11_find_all.py -p hunter2 '''
+python3 pkcs11_find_all.py -p hunter2 '''
 parser = argparse.ArgumentParser(description = description , formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-p', help='pin', required=True, dest='pin')
 

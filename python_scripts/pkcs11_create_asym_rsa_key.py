@@ -52,7 +52,7 @@ def createKeyPair (session, keyname, p11Lib, key_size=2048):
 description = '''
 Create an asymmetric key of size n
 Example:
-./pkcs11_create_asymm_key.py -p hunter2 -k key_name -n 2048'''
+python3 pkcs11_create_asym_rsa_key.py -p hunter2 -k key_name -n 2048'''
 parser = argparse.ArgumentParser(description = description , \
     formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-p', help='pin', required=True, dest='pin')

@@ -5,7 +5,7 @@ import argparse
 description = '''
 Perform a sign and verify using a symmetric key or an object
 Example:
-./pkcs11_sign_verify_symm_key_obj.py -p hunter2 -k key_name -f /path/to/file.txt -m sha256'''
+python3 pkcs11_sign_verify_sym_key.py -p hunter2 -k key_name -f /path/to/file.txt -m sha256'''
 parser = argparse.ArgumentParser(description = description , \
     formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-p', help='pin', required=True, dest='pin')

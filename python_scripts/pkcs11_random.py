@@ -5,7 +5,7 @@ import argparse
 description = '''
 Get n random bytes
 Example:
-./pkcs11_random.py -p hunter2 -n 10'''
+python3 pkcs11_random.py -p hunter2 -n 10'''
 parser = argparse.ArgumentParser(description = description , \
     formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-p', help='pin', required=True, dest='pin')

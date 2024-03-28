@@ -5,7 +5,7 @@ import argparse
 description = '''
 Find the hash digest for a binary file.
 Example:
-./pkcs11_digest.py -p hunter2 -f /path/to/file.txt -m sha256'''
+python3 pkcs11_digest.py -p hunter2 -f /path/to/file.txt -m sha256'''
 parser = argparse.ArgumentParser(description = description , formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-p', help='pin', required=True, dest='pin')
 parser.add_argument('-f', help='file path', required=True, dest='filepath')

@@ -1,11 +1,11 @@
-# This program destroys an asymmetric key
+# This program destroys a symmetric key
 from PyKCS11 import LowLevel
 import argparse
 
 description = '''
-Destroy an asymmetric key
+Destroy a symmetric key
 Example:
-./pkcs11_destroy_asymm_key.py -p hunter2 -k asymmetric_key_name'''
+python3 pkcs11_destroy_sym_key.py -p hunter2 -k aes_key_name'''
 parser = argparse.ArgumentParser(description = description , \
     formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-p', help='pin', required=True, dest='pin')
@@ -38,7 +38,7 @@ rv = p11_lib.C_Login(session, LowLevel.CKU_USER, pin)
 print("%s : C_Login"%rv)
 
 # search key by name
-search_result = LowLevel.ckobjlist(2)
+search_result = LowLevel.ckobjlist(1)
 search_template = LowLevel.ckattrlist(1)
 search_template[0].SetString(LowLevel.CKA_LABEL, key_name)
 
@@ -52,11 +52,17 @@ rv = p11_lib.C_FindObjectsFinal(session)
 print('%s : C_FindObjectsFinal'%rv)
 
 if search_result:
-    print('Key found. ')
-    # destroy the keypair object
-    for keypair in search_result:
-        rv = p11_lib.C_DestroyObject (session, keypair)
-        print('%s : C_DestroyObject'%rv)
+    print('Key found. Destroying ...')
+    # obj_attribute = LowLevel.ckattrlist(1)
+    # obj_attribute[0].SetNum(0x40001000, 3) # set CKA.CKA_THALES_KEY_STATE to 3 >> deactivate
+
+    # # set attribute state to deactivation
+    # rv = p11_lib.C_SetAttributeValue(session, search_result[0], obj_attribute)
+    # print('%s : C_SetAttributeValue'%rv)
+
+    # destroy the key object
+    rv = p11_lib.C_DestroyObject (session, search_result[0])
+    print('%s : C_DestroyObject'%rv)
 else:
     print('Key not found.')
 

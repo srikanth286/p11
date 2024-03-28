@@ -46,18 +46,21 @@ python3 pkcs11_digest.py -p qwerty123 -f pkcs11_consts.py -m sha256
 x pkcs11_find_all.py
 python3 pkcs11_find_all.py -p qwerty123
 
+x pkcs11_get_attribute.py
+python3 pkcs11_get_attribute.py -p qwerty123 -k rsa1 -a CKA_UNWRAP
+
 ### symm key
 x pkcs11_create_symm_key.py
-python3 pkcs11_create_symm_key.py -p qwerty123 -n 256 -k key1
+python3 pkcs11_create_sym_key.py -p qwerty123 -n 256 -k key1
 
 x pkcs11_destroy_symm_key.py
-python3 pkcs11_destroy_symm_key.py -p qwerty123 -k key1
+python3 pkcs11_destroy_sym_key.py -p qwerty123 -k key1
 
 ? pkcs11_sign_verify_symm_key_obj.py
-python3 pkcs11_sign_verify_symm_key_obj.py -p qwerty123 -k key2 -f pkcs11_consts.py -m sha1
+python3 pkcs11_sign_verify_sym_key_obj.py -p qwerty123 -k key2 -f pkcs11_consts.py -m sha1
 
 x pkcs11_encrypt_decrypt_symm_key.py
-python3 pkcs11_encrypt_decrypt_symm_key.py -p qwerty123 -f /tmp/abc.txt -m cbc_pad -k key1
+python3 pkcs11_encrypt_decrypt_sym_key.py -p qwerty123 -f /tmp/abc.txt -m cbc_pad -k key1
 
 - pkcs11_import_symm_key.py
 - pkcs11_export_raw_symm_key.py
@@ -65,30 +68,22 @@ python3 pkcs11_encrypt_decrypt_symm_key.py -p qwerty123 -f /tmp/abc.txt -m cbc_p
 - pkcs11_unwrap_symm_key.py
 
 ### asymm key rsa
-x pkcs11_create_asymm_rsa_key.py
-python3 pkcs11_create_asymm_key.py -p qwerty123 -n 2048 -k rsa1
+x pkcs11_create_asym_rsa_key.py
+python3 pkcs11_create_asym_rsa_key.py -p qwerty123 -n 2048 -k rsa1
 
-x pkcs11_destroy_asymm_key_rsa.py
-python3 pkcs11_destroy_asymm_key.py -p qwerty123 -k rsa2k
+x pkcs11_destroy_asym_rsa_key.py
+python3 pkcs11_destroy_asym_rsa_key.py -p qwerty123 -k rsa2k
 
-x pkcs11_sign_verify_asymm.py
-python3 pkcs11_sign_verify_asymm.py -p qwerty123 -f /tmp/abc.txt -k rsa2k
+x pkcs11_sign_verify_asym_rsa.py
+python3 pkcs11_sign_verify_asym_rsa.py -p qwerty123 -f /tmp/abc.txt -k rsa2k
 
-x pkcs11_encrypt_decrypt_asymm_key.py
-python3 pkcs11_encrypt_decrypt_asymm_key.py -p qwerty123 -k rsa2k -f /tmp/abc.txt 
+x pkcs11_encrypt_decrypt_asym_rsa_key.py
+python3 pkcs11_encrypt_decrypt_asym_rsa_key.py -p qwerty123 -k rsa2k -f /tmp/abc.txt 
 
 - pkcs11_import_asymm_key.py
 - pkcs11_export_asymm_key.py
 
-
-- pkcs11_get_attribute.py
-
-- pkcs11_add_custom_attribute.py
-- pkcs11_migrate_symm_key.py
-- pkcs11_symm_headers_encrypt_decrypt.py
-
-
-
+# get syslog running
 rsyslogd
 
 https://www.keyfactor.com/blog/what-is-acme-protocol-and-how-does-it-work/

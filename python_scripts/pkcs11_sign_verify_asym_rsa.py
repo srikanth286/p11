@@ -5,7 +5,7 @@ import argparse
 description = '''
 Perform a sign and verify using an asymmetric key
 Example:
-./pkcs11_sign_verify_asymm.py -p hunter2 -k key_name -f /path/to/file.txt'''
+python3 pkcs11_sign_verify_asym_rsa.py -p hunter2 -k key_name -f /path/to/file.txt'''
 parser = argparse.ArgumentParser(description = description , \
     formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-p', help='pin', required=True, dest='pin')

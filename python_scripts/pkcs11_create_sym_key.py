@@ -6,7 +6,7 @@ description = '''
 Create a symmetric key (versioned/non versioned)
 The key can also be rotated with the -r switch
 Example:
-./pkcs11_create_symm_key.py -p hunter2 -k aes_key_name -n 256'''
+python3 pkcs11_create_sym_key.py -p hunter2 -k aes_key_name -n 256'''
 parser = argparse.ArgumentParser(description = description , \
     formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-p', help='pin', required=True, dest='pin')

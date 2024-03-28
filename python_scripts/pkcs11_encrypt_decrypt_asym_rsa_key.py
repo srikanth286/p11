@@ -1,36 +1,21 @@
-#!/usr/bin/python
-# This program encrypts and decrypts data using a symmetric key
+# This program encrypts and decrypts data using an asymmetric key
 from PyKCS11 import LowLevel
 import argparse
 
 description = '''
-Perform an encrypt and decrypt with a symmetric key
+Perform an encrypt and decrypt with an asymmetric key
 Example:
-./pkcs11_encrypt_decrypt_symm_key.py -p hunter2 -k key_name -f /path/to/file.txt -m cbc'''
+python3 pkcs11_encrypt_decrypt_asym_rsa_key.py -p hunter2 -k key_name -f /path/to/file.txt'''
 parser = argparse.ArgumentParser(description = description , \
     formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-p', help='pin', required=True, dest='pin')
 parser.add_argument('-k', help='key name', required=True, dest='key_name')
 parser.add_argument('-f', help='file path', required=True, dest='filepath')
-parser.add_argument('-m', help='mechanism (cbc_pad|ctr)', required=True, dest='mechanism')
- #(ecb|cbc|cbc_pad|ctr|fpe|ff1)
+
 args = parser.parse_args()
 pin = bytes(args.pin, 'utf-8')
 key_name = args.key_name
 filepath = args.filepath
-_mechanism = args.mechanism
-if _mechanism == 'ecb':
-    enc_mechanism = LowLevel.CKM_AES_ECB
-elif _mechanism == 'cbc':
-    enc_mechanism = LowLevel.CKM_AES_CBC
-elif _mechanism == 'cbc_pad':
-    enc_mechanism = LowLevel.CKM_AES_CBC_PAD #works with iv
-elif _mechanism == 'ctr':
-    enc_mechanism = LowLevel.CKM_AES_CTR   #works with iv
-elif _mechanism == 'fpe':
-    enc_mechanism = 0x80004001 # CKM_THALES_FPE
-elif _mechanism == 'ff1':
-    enc_mechanism = 0x80004002 #CKM_THALES_FF1
 
 # creates a CPKCS11Lib instance
 p11_lib = LowLevel.CPKCS11Lib() 
@@ -47,7 +32,7 @@ print("%s : C_GetSlotList"%rv)
 
 # start a session
 session = LowLevel.CK_SESSION_HANDLE()
-rv = p11_lib.C_OpenSession(slot_list[0], LowLevel.CKF_SERIAL_SESSION, session)
+rv = p11_lib.C_OpenSession(slot_list[0], LowLevel.CKF_SERIAL_SESSION | LowLevel.CKF_RW_SESSION, session)
 print("%s : C_OpenSession"%rv)
 
 # login
@@ -59,51 +44,56 @@ with open(filepath, 'r') as file:
     data = LowLevel.ckbytelist(bytes(file.read(), 'utf-8'))
 
 # search key by name
-search_result = LowLevel.ckobjlist(1)
-search_template = LowLevel.ckattrlist(1)
-search_template[0].SetString(LowLevel.CKA_LABEL, key_name)
+priv_object = LowLevel.ckobjlist(1)
+search_template_priv = LowLevel.ckattrlist(2)
+search_template_priv[0].SetString(LowLevel.CKA_LABEL, key_name)
+search_template_priv[1].SetNum(LowLevel.CKA_CLASS, LowLevel.CKO_PRIVATE_KEY)
 
-rv = p11_lib.C_FindObjectsInit(session, search_template)
+rv = p11_lib.C_FindObjectsInit(session, search_template_priv)
 print('%s : C_FindObjectsInit'%rv)
-
-rv = p11_lib.C_FindObjects(session, search_result)
+rv = p11_lib.C_FindObjects(session, priv_object)
 print('%s : C_FindObjects'%rv)
-
 rv = p11_lib.C_FindObjectsFinal(session)
 print('%s : C_FindObjectsFinal'%rv)
 
-if search_result:
+pub_object = LowLevel.ckobjlist(1)
+search_template_pub = LowLevel.ckattrlist(2)
+search_template_pub[0].SetString(LowLevel.CKA_LABEL, key_name)
+search_template_pub[1].SetNum(LowLevel.CKA_CLASS, LowLevel.CKO_PUBLIC_KEY)
+
+rv = p11_lib.C_FindObjectsInit(session, search_template_pub) 
+print('%s : C_FindObjectsInit'%rv)
+rv = p11_lib.C_FindObjects(session, pub_object)
+print('%s : C_FindObjects'%rv)
+rv = p11_lib.C_FindObjectsFinal(session)
+print('%s : C_FindObjectsFinal'%rv)
+
+if priv_object and pub_object:
     print("Key found.")
 
     # assign mechanism
     encrypted_data = LowLevel.ckbytelist()
     decrypted_data = LowLevel.ckbytelist()
-    bites = [0x41]*16
-    iv = LowLevel.ckbytelist (bites)
-    mechanism = LowLevel.CK_MECHANISM()
-    mechanism.mechanism = enc_mechanism
-    mechanism.pParameter = iv
-    mechanism.ulParameterLen = len(iv)
+    mechanism = LowLevel.CK_MECHANISM()   
+    mechanism.mechanism = LowLevel.CKM_RSA_PKCS
 
-    # start encryption
-    rv = p11_lib.C_EncryptInit (session, mechanism, search_result[0])
+    # start encryption with public key
+    rv = p11_lib.C_EncryptInit (session, mechanism, pub_object[0])
     print('%s : C_EncryptInit'%rv)
     
     rv = p11_lib.C_Encrypt(session, data, encrypted_data)
     print('%s : C_Encrypt 1'%rv)
-
     rv = p11_lib.C_Encrypt(session, data, encrypted_data)
     print('%s : C_Encrypt 2'%rv)
+
     enc = bytes(encrypted_data).hex()
     print('Encrypted data:', enc)
 
-    # Begin decryption
-    rv = p11_lib.C_DecryptInit(session, mechanism, search_result[0])
+    # Begin decryption with private key
+    rv = p11_lib.C_DecryptInit(session, mechanism, priv_object[0])
     print('%s : C_DecryptInit'%rv)
-
     rv = p11_lib.C_Decrypt(session, encrypted_data, decrypted_data)
     print('%s : C_Decrypt 1'%rv)
-
     rv = p11_lib.C_Decrypt(session, encrypted_data, decrypted_data)
     print('%s : C_Decrypt 2'%rv)
 
