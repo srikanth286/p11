@@ -62,10 +62,10 @@ python3 pkcs11_sign_verify_sym_key_obj.py -p qwerty123 -k key2 -f pkcs11_consts.
 x pkcs11_encrypt_decrypt_symm_key.py
 python3 pkcs11_encrypt_decrypt_sym_key.py -p qwerty123 -f /tmp/abc.txt -m cbc_pad -k key1
 
-- pkcs11_import_symm_key.py
-- pkcs11_export_raw_symm_key.py
-- pkcs11_wrap_symm_key.py
-- pkcs11_unwrap_symm_key.py
+- pkcs11_import_sym_key.py
+- pkcs11_export_raw_sym_key.py
+- pkcs11_wrap_sym_key.py
+- pkcs11_unwrap_sym_key.py
 
 ### asymm key rsa
 x pkcs11_create_asym_rsa_key.py
@@ -74,14 +74,29 @@ python3 pkcs11_create_asym_rsa_key.py -p qwerty123 -n 2048 -k rsa1
 x pkcs11_destroy_asym_rsa_key.py
 python3 pkcs11_destroy_asym_rsa_key.py -p qwerty123 -k rsa2k
 
-x pkcs11_sign_verify_asym_rsa.py
-python3 pkcs11_sign_verify_asym_rsa.py -p qwerty123 -f /tmp/abc.txt -k rsa2k
+x pkcs11_sign_verify_asym_rsa_key.py
+python3 pkcs11_sign_verify_asym_rsa_key.py -p qwerty123 -f /tmp/abc.txt -k rsa2k
 
 x pkcs11_encrypt_decrypt_asym_rsa_key.py
 python3 pkcs11_encrypt_decrypt_asym_rsa_key.py -p qwerty123 -k rsa2k -f /tmp/abc.txt 
 
 - pkcs11_import_asymm_key.py
 - pkcs11_export_asymm_key.py
+
+### asymm key EC
+x pkcs11_create_asym_ec_key.py
+python3 pkcs11_create_asym_ec_key.py -p qwerty123 -k ec1
+
+x pkcs11_destroy_asym_ec_key.py
+python3 pkcs11_destroy_asym_ec_key.py -p qwerty123 -k ec1
+
+x pkcs11_sign_verify_asym_ec.py
+python3 pkcs11_sign_verify_asym_ec_key.py -p qwerty123 -k ec1 -f /tmp/abc.txt
+
+- pkcs11_encrypt_decrypt_asym_ec_key.py
+
+- pkcs11_import_asymm_key_ec.py
+- pkcs11_export_asymm_key_ec.py
 
 # get syslog running
 rsyslogd

@@ -1,11 +1,11 @@
-# This program destroys a symmetric key
+# This program destroys an asymmetric ec key
 from PyKCS11 import LowLevel
 import argparse
 
 description = '''
-Destroy a symmetric key
+Destroy an asymmetric ec key
 Example:
-python3 pkcs11_destroy_sym_key.py -p hunter2 -k aes_key_name'''
+python3 pkcs11_destroy_asym_ec_key.py -p hunter2 -k asymmetric_key_name'''
 parser = argparse.ArgumentParser(description = description , \
     formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-p', help='pin', required=True, dest='pin')
@@ -38,7 +38,7 @@ rv = p11_lib.C_Login(session, LowLevel.CKU_USER, pin)
 print("%s : C_Login"%rv)
 
 # search key by name
-search_result = LowLevel.ckobjlist(1)
+search_result = LowLevel.ckobjlist(2)
 search_template = LowLevel.ckattrlist(1)
 search_template[0].SetString(LowLevel.CKA_LABEL, key_name)
 
@@ -52,11 +52,11 @@ rv = p11_lib.C_FindObjectsFinal(session)
 print('%s : C_FindObjectsFinal'%rv)
 
 if search_result:
-    print('Key found. Destroying ...')
-
-    # destroy the key object
-    rv = p11_lib.C_DestroyObject (session, search_result[0])
-    print('%s : C_DestroyObject'%rv)
+    print('Key found. ')
+    # destroy the keypair object
+    for keypair in search_result:
+        rv = p11_lib.C_DestroyObject (session, keypair)
+        print('%s : C_DestroyObject'%rv)
 else:
     print('Key not found.')
 
