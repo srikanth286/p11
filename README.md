@@ -36,67 +36,67 @@ docker run -it --name p11 --rm p11 sh
 # run simple alpine image
 docker run -it --name noo --rm alpine:3.8 sh
 
-## pkcs11
-x pkcs11_random.py
+## pkcs11 examples
+```python
+pkcs11_random.py
 python3 pkcs11_random.py -p qwerty123 -n 10
 
-x pkcs11_digest.py
+pkcs11_digest.py
 python3 pkcs11_digest.py -p qwerty123 -f pkcs11_consts.py -m sha256
 
-x pkcs11_find_all.py
+pkcs11_find_all.py
 python3 pkcs11_find_all.py -p qwerty123
 
-x pkcs11_get_attribute.py
+pkcs11_get_attribute.py
 python3 pkcs11_get_attribute.py -p qwerty123 -k rsa1 -a CKA_UNWRAP
 
 ### symm key
-x pkcs11_create_symm_key.py
+pkcs11_create_symm_key.py
 python3 pkcs11_create_sym_key.py -p qwerty123 -n 256 -k key1
 
-x pkcs11_destroy_symm_key.py
+pkcs11_destroy_symm_key.py
 python3 pkcs11_destroy_sym_key.py -p qwerty123 -k key1
 
-? pkcs11_sign_verify_symm_key_obj.py
-python3 pkcs11_sign_verify_sym_key_obj.py -p qwerty123 -k key2 -f pkcs11_consts.py -m sha1
-
-x pkcs11_encrypt_decrypt_symm_key.py
+pkcs11_encrypt_decrypt_symm_key.py
 python3 pkcs11_encrypt_decrypt_sym_key.py -p qwerty123 -f /tmp/abc.txt -m cbc_pad -k key1
 
+Todos:
 - pkcs11_import_sym_key.py
 - pkcs11_export_raw_sym_key.py
 - pkcs11_wrap_sym_key.py
 - pkcs11_unwrap_sym_key.py
 
 ### asymm key rsa
-x pkcs11_create_asym_rsa_key.py
+pkcs11_create_asym_rsa_key.py
 python3 pkcs11_create_asym_rsa_key.py -p qwerty123 -n 2048 -k rsa1
 
-x pkcs11_destroy_asym_rsa_key.py
+pkcs11_destroy_asym_rsa_key.py
 python3 pkcs11_destroy_asym_rsa_key.py -p qwerty123 -k rsa2k
 
-x pkcs11_sign_verify_asym_rsa_key.py
+pkcs11_sign_verify_asym_rsa_key.py
 python3 pkcs11_sign_verify_asym_rsa_key.py -p qwerty123 -f /tmp/abc.txt -k rsa2k
 
-x pkcs11_encrypt_decrypt_asym_rsa_key.py
+pkcs11_encrypt_decrypt_asym_rsa_key.py
 python3 pkcs11_encrypt_decrypt_asym_rsa_key.py -p qwerty123 -k rsa2k -f /tmp/abc.txt 
 
+Todos:
 - pkcs11_import_asymm_key.py
 - pkcs11_export_asymm_key.py
 
 ### asymm key EC
-x pkcs11_create_asym_ec_key.py
+pkcs11_create_asym_ec_key.py
 python3 pkcs11_create_asym_ec_key.py -p qwerty123 -k ec1
 
-x pkcs11_destroy_asym_ec_key.py
+pkcs11_destroy_asym_ec_key.py
 python3 pkcs11_destroy_asym_ec_key.py -p qwerty123 -k ec1
 
-x pkcs11_sign_verify_asym_ec.py
+pkcs11_sign_verify_asym_ec.py
 python3 pkcs11_sign_verify_asym_ec_key.py -p qwerty123 -k ec1 -f /tmp/abc.txt
 
-- pkcs11_encrypt_decrypt_asym_ec_key.py
-
+Todos:
 - pkcs11_import_asymm_key_ec.py
 - pkcs11_export_asymm_key_ec.py
+```
 
 # get syslog running
 rsyslogd
