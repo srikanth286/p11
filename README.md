@@ -1,35 +1,32 @@
 # softhsm
 
-## running
+## Running the softhsm container
+```sh
 docker build -t softhsm:2.5.0 .
 docker run -it --name softhsm --rm softhsm:2.5.0 bash
 docker run -d --name softhsm softhsm:2.5.0 
+```
 
-# testing
-
-# python code
-
-# references
-
+## references
 https://github.com/psmiraglia/docker-softhsm/blob/master/README.md
 
-path:
+## path to the lib:
 /usr/local/lib/softhsm/libsofthsm2.so
 
-# show version
+## show version
 softhsm2-util -v
 
-# init token
+## init token
 softhsm2-util --init-token --slot 0 --label "test_token" --so-pin test123 --pin qwerty123
 
-# show slots
+## show slots
 softhsm2-util --show-slots
 
-# delete slot
+## delete slot
 softhsm2-util --delete-token --serial 13deefedf026de1b
 
 
-# python stuff
+# Building and running
 docker build -t p11 .
 docker run -it --name p11 --rm p11 sh
 
