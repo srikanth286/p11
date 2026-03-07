@@ -3,7 +3,7 @@ from PyKCS11 import LowLevel
 import argparse
 
 description = '''
-Perform a sign and verify using an asymmetric key
+Perform a sign and verify using an asymmetric rsa key
 Example:
 python3 pkcs11_sign_verify_asym_rsa_key.py -p hunter2 -k key_name -f /path/to/file.txt'''
 parser = argparse.ArgumentParser(description = description , \
@@ -21,8 +21,8 @@ filepath = args.filepath
 p11_lib = LowLevel.CPKCS11Lib() 
 lib_path = '/lib/softhsm/libsofthsm2.so'
 
-# creates a ckintlist instance to store the SlotList 
-slotList = LowLevel.ckintlist() 
+# creates a ckulonglist instance to store the SlotList 
+slotList = LowLevel.ckulonglist() 
 rv = p11_lib.Load(lib_path)
 print("%s : Load"%rv)
 
@@ -44,12 +44,12 @@ with open(filepath, 'r') as file:
     data = LowLevel.ckbytelist(bytes(file.read(), 'utf-8'))
 
 # search the key by name
-search_result_priv = LowLevel.ckobjlist(1)
+search_result_priv = LowLevel.ckulonglist(1)
 search_template_priv = LowLevel.ckattrlist(2)
 search_template_priv[0].SetString(LowLevel.CKA_LABEL, key_name)
 search_template_priv[1].SetNum(LowLevel.CKA_CLASS, LowLevel.CKO_PRIVATE_KEY)
 
-search_result_pub = LowLevel.ckobjlist(1)
+search_result_pub = LowLevel.ckulonglist(1)
 search_template_pub = LowLevel.ckattrlist(2)
 search_template_pub[0].SetString(LowLevel.CKA_LABEL, key_name)
 search_template_pub[1].SetNum(LowLevel.CKA_CLASS, LowLevel.CKO_PUBLIC_KEY)
@@ -76,8 +76,15 @@ if search_result_priv and search_result_pub:
     mechanism = LowLevel.CK_MECHANISM()
     mechanism.mechanism = LowLevel.CKM_RSA_PKCS 
 
+    # key handles
+    key_handle_priv = LowLevel.CK_OBJECT_HANDLE()
+    key_handle_priv.assign(search_result_priv[0])
+
+    key_handle_pub = LowLevel.CK_OBJECT_HANDLE()
+    key_handle_pub.assign(search_result_pub[0])
+
     # start signing
-    rv = p11_lib.C_SignInit(session, mechanism, search_result_priv[0])
+    rv = p11_lib.C_SignInit(session, mechanism, key_handle_priv)
     print('%s : C_SignInit'%rv)
 
     rv = p11_lib.C_Sign(session, data, signature)
@@ -90,7 +97,7 @@ if search_result_priv and search_result_pub:
     print('Sign:', sig)
 
     # Begin verify
-    rv = p11_lib.C_VerifyInit(session, mechanism, search_result_pub[0])
+    rv = p11_lib.C_VerifyInit(session, mechanism, key_handle_pub)
     print('%s : C_VerifyInit'%rv)
     rv = p11_lib.C_Verify(session, data, signature)
     print('%s : C_Verify'%rv)

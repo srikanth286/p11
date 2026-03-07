@@ -36,8 +36,8 @@ elif _mechanism == 'ff1':
 p11_lib = LowLevel.CPKCS11Lib() 
 lib_path = '/lib/softhsm/libsofthsm2.so'
 
-# creates a ckintlist instance to store the slot_list
-slot_list = LowLevel.ckintlist() 
+# creates a ckulonglist instance to store the slot_list
+slot_list = LowLevel.ckulonglist() 
 rv = p11_lib.Load(lib_path)
 print("%s : Load"%rv)
 
@@ -59,7 +59,7 @@ with open(filepath, 'r') as file:
     data = LowLevel.ckbytelist(bytes(file.read(), 'utf-8'))
 
 # search key by name
-search_result = LowLevel.ckobjlist(1)
+search_result = LowLevel.ckulonglist(1)
 search_template = LowLevel.ckattrlist(1)
 search_template[0].SetString(LowLevel.CKA_LABEL, key_name)
 
@@ -85,8 +85,12 @@ if search_result:
     mechanism.pParameter = iv
     mechanism.ulParameterLen = len(iv)
 
+    key_handle = LowLevel.CK_OBJECT_HANDLE()
+    key_handle.assign(search_result[0])
+
+
     # start encryption
-    rv = p11_lib.C_EncryptInit (session, mechanism, search_result[0])
+    rv = p11_lib.C_EncryptInit (session, mechanism, key_handle)
     print('%s : C_EncryptInit'%rv)
     
     rv = p11_lib.C_Encrypt(session, data, encrypted_data)
@@ -98,7 +102,7 @@ if search_result:
     print('Encrypted data:', enc)
 
     # Begin decryption
-    rv = p11_lib.C_DecryptInit(session, mechanism, search_result[0])
+    rv = p11_lib.C_DecryptInit(session, mechanism, key_handle)
     print('%s : C_DecryptInit'%rv)
 
     rv = p11_lib.C_Decrypt(session, encrypted_data, decrypted_data)

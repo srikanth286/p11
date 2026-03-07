@@ -4,7 +4,7 @@ import argparse
 from asn1crypto.keys import ECDomainParameters, NamedCurve
 
 def searchKey(p11Lib, session, key_name, cko_object):
-    search_result = LowLevel.ckobjlist(1)
+    search_result = LowLevel.ckulonglist(1)
     search_template = LowLevel.ckattrlist(2)
     search_template[0].SetString(LowLevel.CKA_LABEL, key_name)
     search_template[1].SetNum(LowLevel.CKA_CLASS, cko_object)
@@ -75,8 +75,8 @@ key_name = args.key_name
 p11Lib = LowLevel.CPKCS11Lib() 
 lib_path = '/lib/softhsm/libsofthsm2.so'
 
-# creates a ckintlist instance to store the slot_list
-slot_list = LowLevel.ckintlist() 
+# creates a ckulonglist instance to store the slot_list
+slot_list = LowLevel.ckulonglist()
 rv = p11Lib.Load(lib_path)
 print("%s : Load"%rv)
 

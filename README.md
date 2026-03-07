@@ -1,96 +1,108 @@
 # softhsm
+This repo contains a set of pkcs11 python examples that can be used to 
+- Generate random bytes
+- Create symmetric, asymmetric keys
+- Sign, verify with symmetric and asymmetric keys
+- Encrypt and decrypt with symmetric and asymmetric keys
 
-## Running the softhsm container
+## Running the container the easy way
 ```sh
-docker build -t softhsm:2.5.0 .
-docker run -it --name softhsm --rm softhsm:2.5.0 bash
-docker run -d --name softhsm softhsm:2.5.0 
+# build and run
+make build
+
+# just run
+make run
+
+# stop and bring down the container
+make down
+
+# stop the containers and remove volumes
+make wipe
 ```
 
-## references
-https://github.com/psmiraglia/docker-softhsm/blob/master/README.md
-
-## path to the lib:
+## The path to the softhsm lib
+```sh
 /usr/local/lib/softhsm/libsofthsm2.so
+```
 
-## show version
+## softhsm commands
+```sh
+# show version
 softhsm2-util -v
 
-## init token
+# init token
 softhsm2-util --init-token --slot 0 --label "test_token" --so-pin test123 --pin qwerty123
 
-## show slots
+# show slots
 softhsm2-util --show-slots
 
-## delete slot
+# delete slot
 softhsm2-util --delete-token --serial 13deefedf026de1b
+```
 
+## pkcs11
+```sh
+# get into the container
+cd p11
 
-# Building and running
-docker build -t p11 .
-docker run -it --name p11 --rm p11 sh
-
-# run simple alpine image
-docker run -it --name noo --rm alpine:3.8 sh
-
-## pkcs11 examples
-```python
-pkcs11_random.py
+#--- Random ---#
 python3 pkcs11_random.py -p qwerty123 -n 10
 
-pkcs11_digest.py
+#--- Digest ---#
 python3 pkcs11_digest.py -p qwerty123 -f pkcs11_consts.py -m sha256
 
-pkcs11_find_all.py
-python3 pkcs11_find_all.py -p qwerty123
-
-pkcs11_get_attribute.py
-python3 pkcs11_get_attribute.py -p qwerty123 -k rsa1 -a CKA_UNWRAP
-
-### symm key
-pkcs11_create_symm_key.py
+#--- symm key ---#
+# create
 python3 pkcs11_create_sym_key.py -p qwerty123 -n 256 -k key1
 
-pkcs11_destroy_symm_key.py
+#--- find keys ---#
+python3 pkcs11_find_all.py -p qwerty123
+
+#--- get attributes ---#
+python3 pkcs11_get_attribute.py -p qwerty123 -k key1 -a CKA_UNWRAP
+
+# destroy
 python3 pkcs11_destroy_sym_key.py -p qwerty123 -k key1
 
-pkcs11_encrypt_decrypt_symm_key.py
+#? sign, verify >> not working with CKR_KEY_TYPE_INCONSISTENT
+python3 pkcs11_sign_verify_sym_key.py -p qwerty123 -k key1 -f pkcs11_consts.py -m sha1
+
+# encrypt, decrypt
 python3 pkcs11_encrypt_decrypt_sym_key.py -p qwerty123 -f /tmp/abc.txt -m cbc_pad -k key1
 
-Todos:
-- pkcs11_import_sym_key.py
-- pkcs11_export_raw_sym_key.py
+x pkcs11_import_sym_key.py  >> not possible cka_value is readonly
+x pkcs11_export_raw_sym_key.py >> not possible
 - pkcs11_wrap_sym_key.py
 - pkcs11_unwrap_sym_key.py
 
 ### asymm key rsa
-pkcs11_create_asym_rsa_key.py
-python3 pkcs11_create_asym_rsa_key.py -p qwerty123 -n 2048 -k rsa1
+x pkcs11_create_asym_rsa_key.py
+python3 pkcs11_create_asym_rsa_key.py -p qwerty123 -n 2048 -k rsa2k
 
-pkcs11_destroy_asym_rsa_key.py
-python3 pkcs11_destroy_asym_rsa_key.py -p qwerty123 -k rsa2k
-
-pkcs11_sign_verify_asym_rsa_key.py
+x pkcs11_sign_verify_asym_rsa_key.py
 python3 pkcs11_sign_verify_asym_rsa_key.py -p qwerty123 -f /tmp/abc.txt -k rsa2k
 
-pkcs11_encrypt_decrypt_asym_rsa_key.py
+x pkcs11_encrypt_decrypt_asym_rsa_key.py
 python3 pkcs11_encrypt_decrypt_asym_rsa_key.py -p qwerty123 -k rsa2k -f /tmp/abc.txt 
 
-Todos:
+x pkcs11_destroy_asym_rsa_key.py
+python3 pkcs11_destroy_asym_rsa_key.py -p qwerty123 -k rsa2k
+
 - pkcs11_import_asymm_key.py
 - pkcs11_export_asymm_key.py
 
 ### asymm key EC
-pkcs11_create_asym_ec_key.py
+x pkcs11_create_asym_ec_key.py
 python3 pkcs11_create_asym_ec_key.py -p qwerty123 -k ec1
 
-pkcs11_destroy_asym_ec_key.py
-python3 pkcs11_destroy_asym_ec_key.py -p qwerty123 -k ec1
-
-pkcs11_sign_verify_asym_ec.py
+x pkcs11_sign_verify_asym_ec.py
 python3 pkcs11_sign_verify_asym_ec_key.py -p qwerty123 -k ec1 -f /tmp/abc.txt
 
-Todos:
+x pkcs11_destroy_asym_ec_key.py
+python3 pkcs11_destroy_asym_ec_key.py -p qwerty123 -k ec1
+
+- pkcs11_encrypt_decrypt_asym_ec_key.py
+
 - pkcs11_import_asymm_key_ec.py
 - pkcs11_export_asymm_key_ec.py
 ```
@@ -105,6 +117,24 @@ apt install opensc-pkcs11
 opensc-tool -h
 pkcs11-tool --module /lib/softhsm/libsofthsm2.so -l -t
 
+## Docker helper commands
+```sh
+# build the container
+docker build -t softhsm:2.5.0 .
+
+# run the container in interactive mode
+docker run -it --name softhsm --rm softhsm:2.5.0 bash
+
+# run the container in detached mode
+docker run -d --name softhsm softhsm:2.5.0 
+
+# python stuff
+docker build -t p11 .
+docker run -it --name p11 --rm p11 sh
+
+# run simple alpine image
+docker run -it --name noo --rm alpine:3.8 sh
+```
 
 # notes
 python3 pkcs11_find_all.py -p qwerty123
@@ -126,3 +156,7 @@ pkcs11-tool --module /lib/softhsm/libsofthsm2.so -p qwerty123 --keygen --key-typ
   label:      key5
   Usage:      encrypt, decrypt, verify, wrap, unwrap
   Access:     sensitive, always sensitive, never extractable, local
+
+
+## references
+https://github.com/psmiraglia/docker-softhsm/blob/master/README.md
