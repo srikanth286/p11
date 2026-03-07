@@ -3,7 +3,7 @@ from PyKCS11 import LowLevel
 import argparse
 
 description = '''
-Perform a sign and verify using a symmetric key or an object
+Perform a sign and verify using a symmetric key 
 Example:
 python3 pkcs11_sign_verify_sym_key.py -p hunter2 -k key_name -f /path/to/file.txt -m sha256'''
 parser = argparse.ArgumentParser(description = description , \
@@ -35,8 +35,8 @@ elif digest_mechanism == 'sha512':
 p11_lib = LowLevel.CPKCS11Lib() 
 lib_path = '/lib/softhsm/libsofthsm2.so'
 
-# creates a ckintlist instance to store the SlotList 
-slotList = LowLevel.ckintlist() 
+# creates a ckulonglist instance to store the SlotList 
+slotList = LowLevel.ckulonglist() 
 rv = p11_lib.Load(lib_path)
 print("%s : Load"%rv)
 
@@ -53,12 +53,20 @@ print("%s : C_OpenSession"%rv)
 rv = p11_lib.C_Login(session, LowLevel.CKU_USER, pin)
 print("%s : C_Login"%rv)
 
+# mech_bin_list = LowLevel.ckulonglist(100)
+# rv = p11_lib.C_GetMechanismList(slotList[0], mech_bin_list)
+# print("%s : C_GetMechanismList"%rv)
+# print(len(mech_bin_list))
+# for m in mech_bin_list:
+#     if m in mech_dict:
+#         print(mech_dict[m])
+
 # get data from a file
 # with open(filepath, 'r') as file:
     # data = LowLevel.ckbytelist(bytearray(file.read(), encoding='utf8'))
 data = LowLevel.ckbytelist(bytearray('a'*2, encoding='utf8'))
 # search key by name
-search_result = LowLevel.ckobjlist(1)
+search_result = LowLevel.ckulonglist(1)
 search_template = LowLevel.ckattrlist(1)
 search_template[0].SetString(LowLevel.CKA_LABEL, key_name)
 
@@ -79,22 +87,25 @@ if search_result:
     mechanism = LowLevel.CK_MECHANISM()
     mechanism.mechanism = hash_mechanism
 
+    key_handle = LowLevel.CK_OBJECT_HANDLE()
+    key_handle.assign(search_result[0])
+
     # start signing
-    # rv = p11_lib.C_SignInit(session, mechanism, search_result[0])
-    # print('%s : C_SignInit'%rv)
+    rv = p11_lib.C_SignInit(session, mechanism, key_handle)
+    print('%s : C_SignInit'%rv)
 
-    # rv = p11_lib.C_Sign(session, data, signature)
-    # print('%s : C_Sign 1'%rv)
+    rv = p11_lib.C_Sign(session, data, signature)
+    print('%s : C_Sign 1'%rv)
 
-    # rv = p11_lib.C_Sign(session, data, signature)
-    # print('%s : C_Sign 2'%rv)
+    rv = p11_lib.C_Sign(session, data, signature)
+    print('%s : C_Sign 2'%rv)
 
     # sig = bytes(signature).hex()
     sig = 'abcdef'
     print('Sign:', sig)
 
     # # Begin verify
-    rv = p11_lib.C_VerifyInit(session, mechanism, search_result[0])
+    rv = p11_lib.C_VerifyInit(session, mechanism, key_handle)
     print('%s : C_VerifyInit'%rv)
     rv = p11_lib.C_Verify(session, data, signature)
     print('%s : C_Verify'%rv)

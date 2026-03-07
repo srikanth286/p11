@@ -17,8 +17,8 @@ pin = bytes(args.pin, 'utf-8')
 p11_lib = LowLevel.CPKCS11Lib() 
 lib_path = '/lib/softhsm/libsofthsm2.so'
 
-# creates a ckintlist instance to store the slot_list
-slot_list = LowLevel.ckintlist() 
+# creates a ckulonglist instance to store the slot_list
+slot_list = LowLevel.ckulonglist() 
 rv = p11_lib.Load(lib_path)
 print("%s : Load"%rv)
 
@@ -36,7 +36,7 @@ rv = p11_lib.C_Login(session, LowLevel.CKU_USER, pin)
 print("%s : C_Login"%rv)
 
 # search key by name
-search_result = LowLevel.ckobjlist(100)
+search_result = LowLevel.ckulonglist(100)
 search_template = LowLevel.ckattrlist(1)
 search_template[0].SetBool(LowLevel.CKA_TOKEN, True)
 
@@ -51,19 +51,20 @@ print('%s : C_FindObjectsFinal'%rv)
 
 if search_result:
     print('Total number of keys:', len(search_result))
-    
+
     for res_handle in search_result:
         obj_template = LowLevel.ckattrlist(2)
         obj_template[0].SetType(LowLevel.CKA_LABEL)
         obj_template[1].SetType(LowLevel.CKA_KEY_TYPE)
-        # obj_template[2].SetType(LowLevel.CKA_VALUE_LEN)
 
-        rv = p11_lib.C_GetAttributeValue(session, res_handle, obj_template)
+        key_handle = LowLevel.CK_OBJECT_HANDLE()
+        key_handle.assign(res_handle)
+        rv = p11_lib.C_GetAttributeValue(session, key_handle, obj_template)
         print('%s : C_GetAttributeValue'%rv)
-        rv = p11_lib.C_GetAttributeValue(session, res_handle, obj_template)
+        rv = p11_lib.C_GetAttributeValue(session, key_handle, obj_template)
         print('%s : C_GetAttributeValue'%rv)
         
-        print('Key handle :', res_handle.value())
+        print('Key handle :', key_handle.value())
         for i, o in enumerate(obj_template):
             if i == 0:
                 print('key name is:',o.GetString())

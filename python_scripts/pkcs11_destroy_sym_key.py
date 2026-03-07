@@ -19,8 +19,8 @@ key_name = args.key_name
 p11_lib = LowLevel.CPKCS11Lib() 
 lib_path = '/lib/softhsm/libsofthsm2.so'
 
-# creates a ckintlist instance to store the slot_list
-slot_list = LowLevel.ckintlist() 
+# creates a ckulonglist instance to store the slot_list
+slot_list = LowLevel.ckulonglist() 
 rv = p11_lib.Load(lib_path)
 print("%s : Load"%rv)
 
@@ -38,7 +38,7 @@ rv = p11_lib.C_Login(session, LowLevel.CKU_USER, pin)
 print("%s : C_Login"%rv)
 
 # search key by name
-search_result = LowLevel.ckobjlist(1)
+search_result = LowLevel.ckulonglist(10)
 search_template = LowLevel.ckattrlist(1)
 search_template[0].SetString(LowLevel.CKA_LABEL, key_name)
 
@@ -55,8 +55,11 @@ if search_result:
     print('Key found. Destroying ...')
 
     # destroy the key object
-    rv = p11_lib.C_DestroyObject (session, search_result[0])
-    print('%s : C_DestroyObject'%rv)
+    key_handle = LowLevel.CK_OBJECT_HANDLE()
+    key_handle.assign(search_result[0])
+    rv = p11_lib.C_DestroyObject(session, key_handle)
+    print('%s : C_DestroyObject' % rv)
+    
 else:
     print('Key not found.')
 

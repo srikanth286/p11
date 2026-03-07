@@ -3,8 +3,7 @@ from PyKCS11 import LowLevel
 import argparse
 
 description = '''
-Create a symmetric key (versioned/non versioned)
-The key can also be rotated with the -r switch
+Create a symmetric key
 Example:
 python3 pkcs11_create_sym_key.py -p hunter2 -k aes_key_name -n 256'''
 parser = argparse.ArgumentParser(description = description , \
@@ -22,8 +21,8 @@ size = int(args.size/8)
 p11_lib = LowLevel.CPKCS11Lib() 
 lib_path = '/lib/softhsm/libsofthsm2.so'
 
-# creates a ckintlist instance to store the slot_list
-slot_list = LowLevel.ckintlist() 
+# creates a ckulonglist instance to store the slot_list
+slot_list = LowLevel.ckulonglist() 
 rv = p11_lib.Load(lib_path)
 print("%s : Load"%rv)
 
@@ -41,7 +40,7 @@ rv = p11_lib.C_Login(session, LowLevel.CKU_USER, pin)
 print("%s : C_Login"%rv)
 
 # search key by name
-search_result = LowLevel.ckobjlist(1)
+search_result = LowLevel.ckulonglist(1)
 search_template = LowLevel.ckattrlist(1)
 search_template[0].SetString(LowLevel.CKA_LABEL, key_name)
 

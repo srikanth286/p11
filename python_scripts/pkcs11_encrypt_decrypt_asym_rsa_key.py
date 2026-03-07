@@ -21,8 +21,8 @@ filepath = args.filepath
 p11_lib = LowLevel.CPKCS11Lib() 
 lib_path = '/lib/softhsm/libsofthsm2.so'
 
-# creates a ckintlist instance to store the slot_list
-slot_list = LowLevel.ckintlist() 
+# creates a ckulonglist instance to store the slot_list
+slot_list = LowLevel.ckulonglist() 
 rv = p11_lib.Load(lib_path)
 print("%s : Load"%rv)
 
@@ -44,7 +44,7 @@ with open(filepath, 'r') as file:
     data = LowLevel.ckbytelist(bytes(file.read(), 'utf-8'))
 
 # search key by name
-priv_object = LowLevel.ckobjlist(1)
+priv_object = LowLevel.ckulonglist(1)
 search_template_priv = LowLevel.ckattrlist(2)
 search_template_priv[0].SetString(LowLevel.CKA_LABEL, key_name)
 search_template_priv[1].SetNum(LowLevel.CKA_CLASS, LowLevel.CKO_PRIVATE_KEY)
@@ -56,7 +56,7 @@ print('%s : C_FindObjects'%rv)
 rv = p11_lib.C_FindObjectsFinal(session)
 print('%s : C_FindObjectsFinal'%rv)
 
-pub_object = LowLevel.ckobjlist(1)
+pub_object = LowLevel.ckulonglist(1)
 search_template_pub = LowLevel.ckattrlist(2)
 search_template_pub[0].SetString(LowLevel.CKA_LABEL, key_name)
 search_template_pub[1].SetNum(LowLevel.CKA_CLASS, LowLevel.CKO_PUBLIC_KEY)
@@ -77,8 +77,16 @@ if priv_object and pub_object:
     mechanism = LowLevel.CK_MECHANISM()   
     mechanism.mechanism = LowLevel.CKM_RSA_PKCS
 
+    # key handles
+    key_handle_priv = LowLevel.CK_OBJECT_HANDLE()
+    key_handle_priv.assign(priv_object[0])
+
+    key_handle_pub = LowLevel.CK_OBJECT_HANDLE()
+    key_handle_pub.assign(pub_object[0])
+
+
     # start encryption with public key
-    rv = p11_lib.C_EncryptInit (session, mechanism, pub_object[0])
+    rv = p11_lib.C_EncryptInit (session, mechanism, key_handle_pub)
     print('%s : C_EncryptInit'%rv)
     
     rv = p11_lib.C_Encrypt(session, data, encrypted_data)
@@ -90,7 +98,7 @@ if priv_object and pub_object:
     print('Encrypted data:', enc)
 
     # Begin decryption with private key
-    rv = p11_lib.C_DecryptInit(session, mechanism, priv_object[0])
+    rv = p11_lib.C_DecryptInit(session, mechanism, key_handle_priv)
     print('%s : C_DecryptInit'%rv)
     rv = p11_lib.C_Decrypt(session, encrypted_data, decrypted_data)
     print('%s : C_Decrypt 1'%rv)
