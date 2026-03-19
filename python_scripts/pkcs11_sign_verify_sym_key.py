@@ -1,4 +1,5 @@
 # This program performs a sign and a verify with a symmetric AES key and objects
+
 from PyKCS11 import LowLevel
 import argparse
 
@@ -53,18 +54,10 @@ print("%s : C_OpenSession"%rv)
 rv = p11_lib.C_Login(session, LowLevel.CKU_USER, pin)
 print("%s : C_Login"%rv)
 
-# mech_bin_list = LowLevel.ckulonglist(100)
-# rv = p11_lib.C_GetMechanismList(slotList[0], mech_bin_list)
-# print("%s : C_GetMechanismList"%rv)
-# print(len(mech_bin_list))
-# for m in mech_bin_list:
-#     if m in mech_dict:
-#         print(mech_dict[m])
-
 # get data from a file
-# with open(filepath, 'r') as file:
-    # data = LowLevel.ckbytelist(bytearray(file.read(), encoding='utf8'))
-data = LowLevel.ckbytelist(bytearray('a'*2, encoding='utf8'))
+with open(filepath, 'r') as file:
+    data = LowLevel.ckbytelist(bytearray(file.read(), encoding='utf8'))
+
 # search key by name
 search_result = LowLevel.ckulonglist(1)
 search_template = LowLevel.ckattrlist(1)
@@ -100,8 +93,7 @@ if search_result:
     rv = p11_lib.C_Sign(session, data, signature)
     print('%s : C_Sign 2'%rv)
 
-    # sig = bytes(signature).hex()
-    sig = 'abcdef'
+    sig = bytes(signature).hex()
     print('Sign:', sig)
 
     # # Begin verify

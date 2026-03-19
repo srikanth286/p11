@@ -61,11 +61,14 @@ python3 pkcs11_find_all.py -p qwerty123
 #--- get attributes ---#
 python3 pkcs11_get_attribute.py -p qwerty123 -k key1 -a CKA_UNWRAP
 
-# destroy
+#--- destroy ---#
 python3 pkcs11_destroy_sym_key.py -p qwerty123 -k key1
 
-#? sign, verify >> not working with CKR_KEY_TYPE_INCONSISTENT
-python3 pkcs11_sign_verify_sym_key.py -p qwerty123 -k key1 -f pkcs11_consts.py -m sha1
+#--- create generic secret key ---#
+python3 pkcs11_create_generic_secret_key.py -p qwerty123 -n 256 -k gen_sec
+
+#--- sign, verify ---#
+python3 pkcs11_sign_verify_sym_key.py -p qwerty123 -f /tmp/abc.txt -m sha256 -k gen_sec
 
 # encrypt, decrypt
 python3 pkcs11_encrypt_decrypt_sym_key.py -p qwerty123 -f /tmp/abc.txt -m cbc_pad -k key1
@@ -100,8 +103,6 @@ python3 pkcs11_sign_verify_asym_ec_key.py -p qwerty123 -k ec1 -f /tmp/abc.txt
 
 x pkcs11_destroy_asym_ec_key.py
 python3 pkcs11_destroy_asym_ec_key.py -p qwerty123 -k ec1
-
-- pkcs11_encrypt_decrypt_asym_ec_key.py
 
 - pkcs11_import_asymm_key_ec.py
 - pkcs11_export_asymm_key_ec.py
